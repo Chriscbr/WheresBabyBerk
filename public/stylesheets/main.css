@@ -10,7 +10,12 @@
       background: #a3e000; }
   .jumbotron p {
     max-width: 75%;
-    margin: 1em auto 2em; }
+    margin: 1em auto 2em;
+    font-weight: bold; }
+
+.header {
+  background: #ffdc00;
+}
 
 /* Customize container */
 @media (min-width: 768px) {
