@@ -1,6 +1,7 @@
 .jumbotron {
   background: #ffdc00;
   color: white;
+  text-shadow: 0px 0px 2px black;
   padding: 10px; }
   .jumbotron .btn-primary {
     background: #aded00;
@@ -11,6 +12,15 @@
     max-width: 75%;
     margin: 1em auto 2em; }
 
+/* Customize container */
+@media (min-width: 768px) {
+  .container {
+    max-width: 730px;
+  }
+}
+.container-narrow > hr {
+  margin: 30px 0;
+}
 /*
 .jumbotron {
   background: #532F8C;
