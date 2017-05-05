@@ -9,28 +9,35 @@
     <div class="jumbotron">
       <div class="container text-center">
         <h1>Where's BabyBerk?</h1>
-        <p>Your one stop for finding the best food trunks at UMass.</p>
+        <p>Your one stop for finding the best food trucks at UMass.</p>
       </div>
     </div>
 
     <div class="container">
+      <div class="row">
       <div class="col-md-6">
-      <h3 class="text-center">BabyBerk 1</h3>
-      <p class="text-center">Content</p>
-      <a class="twitter-timeline" data-height="400" data-dnt="true" href="https://twitter.com/UMassBabyBerk">Tweets by UMassBabyBerk</a> <script async src="//platform.twitter.com/widgets.js" charset="utf-8"></script>
-    </div>
-    <div class="col-md-6">
-      <h3 class="text-center">BabyBerk 2</h3>
-      <p class="text-center">Content</p>
-      <a class="twitter-timeline" data-height="400" data-dnt="true" href="https://twitter.com/https://twitter.com/UMassBabyBerk2">Tweets by https://twitter.com/UMassBabyBerk2</a> <script async src="//platform.twitter.com/widgets.js" charset="utf-8"></script>
-    </div> 
+        <h3 class="text-center">BabyBerk 1</h3>
+        <% include ../partials/content1.ejs %>
+        <div class="well tweets">
+        <a class="twitter-timeline" data-height="400" data-dnt="true" href="https://twitter.com/UMassBabyBerk">Tweets by UMassBabyBerk</a> <script async src="//platform.twitter.com/widgets.js" charset="utf-8"></script>
+        </div>
+      </div>
+      <div class="col-md-6">
+        <h3 class="text-center">BabyBerk 2</h3>
+        <% include ../partials/content2.ejs %>
+        <div class="well tweets">
+        <a class="twitter-timeline" data-height="400" data-dnt="true" href="https://twitter.com/https://twitter.com/UMassBabyBerk2">Tweets by https://twitter.com/UMassBabyBerk2</a> <script async src="//platform.twitter.com/widgets.js" charset="utf-8"></script>
+        </div>
+      </div>
+      </div>
 
+      <div class="row">
+        <hr>
 
-      <hr>
-
-      <footer>
-        <p>&copy; 2016 Company, Inc.</p>
-      </footer>
+        <footer>
+          <p>Developed with <span class="glyphicon glyphicon-heart" aria-hidden="true"></span> by Christopher Rybicki. 2017</p>
+        </footer>
+      </div>
     </div>
 
   </body>

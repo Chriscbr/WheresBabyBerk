@@ -1,8 +1,12 @@
 .jumbotron {
-  background: #ffdc00;
-  color: black; }
-  .jumbotron .btn-primary {
-    background: #aded00;
-    border-color: #a1dd00; }
-    .jumbotron .btn-primary:hover {
-      background: #a3e000; }
+  background: #98d100;
+  color: white; }
+
+ .tweets {
+ 	background: white;
+ }
+
+ .none-found {
+ 	padding-top: 10px;
+ 	padding-bottom: 10px;
+ }
