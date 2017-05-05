@@ -24,11 +24,13 @@ client.get('search/tweets', {q: 'from:UMassBabyBerk'}, function(error, tweets, r
   bb1 = tweets;
   console.log(tweets);
 
-  bb1text = bb1.statuses[0].text;
-  tokenizer = new natural.RegexpTokenizer({pattern: /((?:(?:\d{1,2}:\d\d)|(?:\d{1,2}))(?:(?:\s?-\s?)|\s?to\s?)(?:(?:\d{1,2}:\d\d)|(?:\d{1,2})))/g});
-  bb1words = tokenizer.tokenize(bb1text);
-  // data.places = bb1words.join();
-  // data.found = true;
+  if (bb1.hasOwnProperty('statuses')) {
+    bb1text = bb1.statuses[0].text;
+    tokenizer = new natural.RegexpTokenizer({pattern: /((?:(?:\d{1,2}:\d\d)|(?:\d{1,2}))(?:(?:\s?-\s?)|\s?to\s?)(?:(?:\d{1,2}:\d\d)|(?:\d{1,2})))/g});
+    bb1words = tokenizer.tokenize(bb1text);
+    // data.places = bb1words.join();
+    // data.found = true;
+  }
 });
 
 app.set('port', (process.env.PORT || 5000));
