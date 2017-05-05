@@ -1,0 +1,23 @@
+<% if (!content1.found) { %>
+	<h4 class="text-center">No BabyBerk found. Check the latest tweets!</h4>
+<% } else { %>
+	<h4 class="text-center">Currently at <span class="glyphicon glyphicon-map-marker" aria-hidden="true"></span><%= content1.places[0] %> until <%= content1.times[1] %></h4>
+	<% if (content1.places.length > 1) { %>
+		<table class="table">
+		<thead>
+			<tr>
+				<th class="text-center">Location</th>
+				<th class="text-center">Time</th>
+			</tr>
+		</thead>
+		<tbody>
+		<% for(var i=1; i<content1.places.length; i++) { %>
+			<tr>
+			<td class="text-center"><%= content1.places[i] %></td>
+			<td class="text-center"><%= content1.times[2*i] %>-<%= content1.times[2*i+1] %></td>
+			</tr>
+		<% } %>
+		</tbody>
+		</table>
+	<% } %>
+<% } %>
