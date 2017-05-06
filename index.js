@@ -1,7 +1,7 @@
 var express = require('express');
 var app = express();
 var Twitter = require('twitter');
-var natural = require('natural');
+var interpret = require('./extract_data')
 
 var client = new Twitter({
   consumer_key: process.env.TWITTER_CONSUMER_KEY,
@@ -10,27 +10,15 @@ var client = new Twitter({
   access_token_secret: process.env.TWITTER_ACCESS_TOKEN_SECRET
 });
 
-var bb1;
-var bb1text;
-var bb1parse;
-var data1 = {found: true,
-            places: ['Northeast', 'Kennedy', 'Hampden'],
-            times: ['6:00', '8:00', '8:15', '10:00', '10:15', '12:00']}
-var data2 = {found: true,
-             places: ['Orchard Hill', 'Kennedy', 'Hampden'],
-             times: ['8:15', '10:00', '10:15', '12:00', '12:15', '2:00']}
+var bb1_tweets;
+var bb2_tweets;
+var bb1_data;
+var bb2_data;
 
 client.get('search/tweets', {q: 'from:UMassBabyBerk'}, function(error, tweets, response) {
-  bb1 = tweets;
+  bb1_tweets = tweets;
   console.log(tweets);
-
-  if (bb1.hasOwnProperty('statuses')) {
-    bb1text = bb1.statuses[0].text;
-    tokenizer = new natural.RegexpTokenizer({pattern: /((?:(?:\d{1,2}:\d\d)|(?:\d{1,2}))(?:(?:\s?-\s?)|\s?to\s?)(?:(?:\d{1,2}:\d\d)|(?:\d{1,2})))/g});
-    bb1words = tokenizer.tokenize(bb1text);
-    // data.places = bb1words.join();
-    // data.found = true;
-  }
+  bb1_data = interpret.extract_data(bb1_tweets, bb2_tweets);
 });
 
 app.set('port', (process.env.PORT || 5000));
@@ -42,11 +30,12 @@ app.set('views', __dirname + '/views');
 app.set('view engine', 'ejs');
 
 app.get('/', function(request, response) {
-  var content1 = data1;
-  var content2 = data2;
+  var data1 = bb1_data;
+  var data2 = bb2_data;
+  console.log(data);
   response.render('pages/index', {
-    content1: content1,
-    content2: content2
+    content1: data1,
+    content2: data2
   });
 });
 
