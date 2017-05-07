@@ -1,12 +1,64 @@
+html, body {
+  height: 100%;
+}
+
 .jumbotron {
   background: #98d100;
   color: white; }
 
- .tweets {
- 	background: white;
+.tweets {
+  background: white;
  }
 
- .none-found {
- 	padding-top: 10px;
- 	padding-bottom: 10px;
+.none-found {
+  padding-top: 10px;
+  padding-bottom: 10px;
  }
+
+.wrapper {
+  min-height: 100%;
+  width: 100% ;
+  height: 100%;
+  display: table;
+  background: #98d100;
+  color: white;
+ }
+
+.wrapper-inner {
+  display: table-cell;
+  vertical-align: top;
+ }
+
+.cover-container {
+  margin-right: auto;
+  margin-left: auto;
+ }
+
+.cover {
+  padding: 0 1.5rem;
+}
+
+.cover-title {
+  font-size: 4em;
+}
+
+/*
+ * Affix and center
+ */
+
+@media (min-width: 40em) {
+  /* Start the vertical centering */
+  .wrapper-inner {
+    vertical-align: middle;
+  }
+  /* Handle the widths */
+  .cover-container {
+    width: 100%; /* Must be percentage or pixels for horizontal alignment */
+  }
+}
+
+@media (min-width: 62em) {
+  .cover-container {
+    width: 60rem;
+  }
+}

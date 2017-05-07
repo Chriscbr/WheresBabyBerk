@@ -36,6 +36,10 @@ app.set('views', __dirname + '/views');
 app.set('view engine', 'ejs');
 
 app.get('/', function(request, response) {
+  response.render('pages/banner', {data: null});
+});
+
+app.get('/test', function(request, response) {
   var data1 = bb1_data;
   var data2 = bb2_data;
   // console.log(data1);
