@@ -26,7 +26,7 @@ html, body {
 
 .wrapper-inner {
   display: table-cell;
-  vertical-align: top;
+  vertical-align: middle;
  }
 
 .cover-container {
@@ -39,7 +39,7 @@ html, body {
 }
 
 .cover-title {
-  font-size: 4em;
+  font-size: 2.5em;
 }
 
 /*
@@ -47,13 +47,12 @@ html, body {
  */
 
 @media (min-width: 40em) {
-  /* Start the vertical centering */
-  .wrapper-inner {
-    vertical-align: middle;
-  }
   /* Handle the widths */
   .cover-container {
     width: 100%; /* Must be percentage or pixels for horizontal alignment */
+  }
+  .cover-title {
+    font-size: 4em;
   }
 }
 
