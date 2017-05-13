@@ -1,7 +1,7 @@
 var express = require('express');
 var app = express();
 var Twitter = require('twitter');
-var interpret = require('./extract_data')
+var interpret = require('./extract_data');
 
 var client = new Twitter({
   consumer_key: process.env.TWITTER_CONSUMER_KEY,
@@ -10,21 +10,28 @@ var client = new Twitter({
   access_token_secret: process.env.TWITTER_ACCESS_TOKEN_SECRET
 });
 
-var bb1_tweets, bb2_tweets, bb1_data, bb2_data;
+var bb1_data, bb2_data;
 
 client.get('search/tweets', {q: 'from:UMassBabyBerk'}, function(error, tweets, response) {
   if (error) {
-    console.log('Error thrown from Twitter API Search query "from:UMassBabyBerk"')
+    console.log('Error thrown from Twitter API Search query "from:UMassBabyBerk"');
+    bb1_data = {
+      found: false
+    };
+  } else {
+    bb1_data = interpret.extractData(tweets);
   }
-  bb1_tweets = tweets;
-  console.log(tweets);
-  bb1_data = interpret.extract_data(bb1_tweets);
 });
 
 client.get('search/tweets', {q: 'from:UMassBabyBerk2'}, function(error, tweets, response) {
-  bb2_tweets = tweets;
-  console.log(tweets);
-  bb2_data = interpret.extract_data(bb2_tweets);
+  if (error) {
+    console.log('Error thrown from Twitter API Search query "from:UMassBabyBerk"');
+    bb2_data = {
+      found: false
+    };
+  } else {
+    bb2_data = interpret.extractData(tweets);
+  }
 });
 
 app.set('port', (process.env.PORT || 5000));
@@ -40,13 +47,9 @@ app.get('/', function(request, response) {
 });
 
 app.get('/test', function(request, response) {
-  var data1 = bb1_data;
-  var data2 = bb2_data;
-  // console.log(data1);
-  // console.log(data2);
   response.render('pages/index', {
-    content1: data1,
-    content2: data2
+    content1: bb1_data,
+    content2: bb2_data
   });
 });
 
