@@ -10,9 +10,9 @@ html, body {
   background: white;
  }
 
-.none-found {
-  padding-top: 10px;
-  padding-bottom: 10px;
+.extra-space {
+  padding-top: 5px;
+  padding-bottom: 15px;
  }
 
 .wrapper {
