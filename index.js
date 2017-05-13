@@ -25,7 +25,7 @@ client.get('search/tweets', {q: 'from:UMassBabyBerk'}, function(error, tweets, r
 
 client.get('search/tweets', {q: 'from:UMassBabyBerk2'}, function(error, tweets, response) {
   if (error) {
-    console.log('Error thrown from Twitter API Search query "from:UMassBabyBerk"');
+    console.log('Error thrown from Twitter API Search query "from:UMassBabyBerk2"');
     bb2_data = {
       found: false
     };
