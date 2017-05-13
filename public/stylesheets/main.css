@@ -11,8 +11,7 @@ html, body {
  }
 
 .extra-space {
-  padding-top: 5px;
-  padding-bottom: 15px;
+  padding: 5px 10px 15px 10px;
  }
 
 .wrapper {
