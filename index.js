@@ -12,9 +12,9 @@ var client = new Twitter({
 
 var bb1_data, bb2_data;
 
-client.get('search/tweets', {q: 'from:UMassBabyBerk'}, function(error, tweets, response) {
+client.get('statuses/user_timeline', {screen_name: 'UMassBabyBerk'}, function(error, tweets, response) {
   if (error) {
-    console.log('Error thrown from Twitter API Search query "from:UMassBabyBerk"');
+    console.log('Error thrown from Twitter API UMassBabyBerk Timeline');
     bb1_data = {
       found: false
     };
@@ -23,9 +23,9 @@ client.get('search/tweets', {q: 'from:UMassBabyBerk'}, function(error, tweets, r
   }
 });
 
-client.get('search/tweets', {q: 'from:UMassBabyBerk2'}, function(error, tweets, response) {
+client.get('statuses/user_timeline', {screen_name: 'UMassBabyBerk2'}, function(error, tweets, response) {
   if (error) {
-    console.log('Error thrown from Twitter API Search query "from:UMassBabyBerk2"');
+    console.log('Error thrown from Twitter API UMassBabyBerk2 Timeline');
     bb2_data = {
       found: false
     };

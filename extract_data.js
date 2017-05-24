@@ -56,13 +56,12 @@ Example output value:
 */
 exports.extractData = function (tweets) {
   console.log('Begin extractData...');
-  console.log(tweets);
+  // console.log(tweets);
 
   var output;
 
-  if (tweets != null && tweets.hasOwnProperty('statuses') &&
-      tweets.statuses.length > 0) {
-    output = parseTweet(tweets.statuses[0]);
+  if (tweets.length > 0) {
+    output = parseTweet(tweets[0]);
   } else {
     output = {
       found: false,
