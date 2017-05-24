@@ -36,63 +36,84 @@ var known_locations = [
 ['durfee conservatory', 'Durfee Conservatory']
 ]
 
-var timeIntervalRegex = /((?:(?:\d{1,2}:\d\d)|(?:\d{1,2}))(?:(?:\s?-\s?)|\s?to\s?)(?:(?:\d{1,2}:\d\d)|(?:\d{1,2})))/g;
+// Regex used for tokenizing tweet text, used by parseTweet and parseText
+var timeIntervalRegex = /(?:(?:\d{1,2}:\d\d)|(?:\d{1,2}))(?:(?:\s?-\s?)|\s?to\s?)(?:(?:\d{1,2}:\d\d)|(?:\d{1,2}))/g;
+var timeIntRegex = new RegExp(''
+  + /(?:(?:\d{1,2}:\d\d)|(?:\d{1,2}))/g.source  // time1
+  + /(?:(?:\s?-\s?)|\s?to\s?)/g.source          // '-' or 'to'
+  + /(?:(?:\d{1,2}:\d\d)|(?:\d{1,2}))/g.source  // time2
+);
 
+/*
+Extracts the desired data from a tweets object returned by the Twitter API.
+Operates by checking for valid tweets, and passing on operation to parseTweet.
+Example output value:
+{
+  found: bool,
+  places: [list of strings],
+  times: [list of strings]
+}
+*/
 exports.extractData = function (tweets) {
   console.log('Begin extractData...');
+  console.log(tweets);
 
-  var out;
+  var output;
 
-  if (tweets != null && tweets.hasOwnProperty('statuses')) {
-    out = parseTweet(tweets.statuses[0]);
+  if (tweets != null && tweets.hasOwnProperty('statuses') &&
+      tweets.statuses.length > 0) {
+    output = parseTweet(tweets.statuses[0]);
   } else {
-    out = {
-      found: false
+    output = {
+      found: false,
+      places: [],
+      times: []
     };
   }
-  console.log('Finished extractData. Data returned:');
-  console.log(out);
 
-  return out;
+  console.log('Finished extractData. Data returned:');
+  console.log(output);
+
+  return output;
 }
 
+/*
+
+*/
 function parseTweet(tweet) {
-  var out = {
-    found: false,
-    places: [],
-    times: []
-  };
-
-  var tweet_text = tweet.text;
-
-  console.log('Tweet text: ' + tweet_text);
+  console.log('Tweet text: ' + tweet.text);
   console.log('Tweet author: ' + tweet.user.screen_name);
 
+  var data = {
+    found: false, 
+    places: [],
+    times: []
+  }
+
+  var completeText = tweet.text;
   var tokenizer = new natural.RegexpTokenizer({pattern: timeIntervalRegex});
-  var sections = tokenizer.tokenize(tweet_text);
+  var sections = tokenizer.tokenize(completeText);
   for (var i = 0; i < sections.length; i++) {
-    out = parse(sections[i], out);
+    data = parseText(sections[i], data);
   }
 
-  tweet_time_str = tweet.created_at; // ex. Sat May 06 02:27:46 +0000 2017
-  tweet_time = new Date(
-    tweet_time_str.replace(/^\w+ (\w+) (\d+) ([\d:]+) \+0000 (\d+)$/,
-    "$1 $2 $4 $3 UTC"));
-  twelve_hrs_passed = new Date(tweet_time.getTime() + 60000 * 60 * 12); // adds 12 hours
-  curr_time = new Date();
-
-  if (2 * out.places.length == out.times.length && curr_time < twelve_hrs_passed) {
-    out.found = true;
+  // return no data found if data is invalid
+  if (!(2 * data.places.length === data.times.length && isRecent(tweet))) {
+    return {
+      found: false,
+      places: [],
+      times: []
+    };
+  } else {
+    return convertData(data);
   }
-
-  return out;
 }
 
 // parses a "section" of tweet text, which is either a time interval
 // (i.e. "2:30-4") or a string of words in between those
 // intuitively, there should only be one match in between each time interval
-function parse(str, out) {
-  newOut = out;
+function parseText(str, data) {
+  output = data;
 
   if (timeIntervalRegex.test(str)) { // if it is a time
 
@@ -103,8 +124,8 @@ function parse(str, out) {
     if (!/(\d{1,2}:\d\d)/g.test(times[1])) {
       times[1] = times[1] + ':00';
     }
-    newOut.times.push(times[0]);
-    newOut.times.push(times[1]);
+    output.times.push(times[0]);
+    output.times.push(times[1]);
 
   } else {
 
@@ -148,10 +169,42 @@ function parse(str, out) {
     }
 
     if (match != "") {
-      newOut.places.push(match);
+      output.places.push(match);
     }
 
   }
 
-  return newOut;
+  return output;
+}
+
+// checks if a tweet was made in the last 12 hours
+function isRecent(tweet) {
+  var tweetTimeStr = tweet.created_at; // ex. Sat May 06 02:27:46 +0000 2017
+  var tweetTime = new Date(
+    tweetTimeStr.replace(/^\w+ (\w+) (\d+) ([\d:]+) \+0000 (\d+)$/,
+    "$1 $2 $4 $3 UTC"));
+  var tweetTimePlus12 = new Date(tweetTime.getTime() + 60000 * 60 * 12); // adds 12 hours
+  var currTime = new Date();
+
+  return currTime < tweetTimePlus12;
+}
+
+// converts list of locations and times into associative array
+function convertData(data) {
+  var places = data.places;
+  var times = data.times;
+
+  console.log('Converting data...');
+  console.log(places);
+  console.log(times);
+
+  var output = {};
+  for (var i = 0; i < data.places; i++) {
+    output[places[i]] = [times[2*i + 1], times[2*i + 1]];
+  }
+
+  console.log('Output data:');
+  console.log(output);
+
+  return output;
 }
