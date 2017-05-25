@@ -1,40 +1,5 @@
 var natural = require('natural');
-
-var known_locations = [
-['ohill', 'Orchard Hill'],
-['o. hill', 'Orchard Hill'],
-['o-hill', 'Orchard Hill'],
-['orchard hill', 'Orchard Hill'],
-['hampden', 'Hampden'],
-['kennedy', 'Kennedy'],
-['northeast', 'Northeast'],
-['lgrc', 'LGRC'],
-['haigis', 'Haigis'],
-['design building', 'Design Building'],
-['design build', 'Design Building'],
-['design', 'Design Building'],
-['southwest', 'Southwest'],
-['southwest horseshoe', 'Southwest'],
-['fleet services', 'Fleet Services'],
-['whitmore', 'Whitmore'],
-['softball', 'Softball'],
-['umass softball', 'Softball'],
-['baseball', 'Baseball'],
-['umass baseball', 'Baseball'],
-['curry hicks', 'Curry Hicks'],
-['student union', 'Student Union'],
-['umpd', 'UMPD'],
-['goodell', 'Goodell'],
-['mullins', 'Mullins'],
-['fine arts', 'Fine Arts Center'], 
-['fac', 'Fine Arts Center'],
-['lorden field', 'Lorden Field'],
-['physical plant', 'Physical Plant'],
-['curtain theatre', 'Curtain Theatre'],
-['farmers market', 'Farmers Market'],
-['north apartments', 'North Apartments'],
-['durfee conservatory', 'Durfee Conservatory']
-]
+var locations = require('./locations');
 
 // Regex used for tokenizing tweet text, used by parseTweet and parseText
 var timeIntervalRegex = /((?:(?:\d{1,2}:\d\d)|(?:\d{1,2}))(?:(?:\s?-\s?)|\s?to\s?)(?:(?:\d{1,2}:\d\d)|(?:\d{1,2})))/g;
@@ -139,10 +104,10 @@ function parseText(text, data) {
       var diff = 0; // (0 = no match, 1 = exact match)
 
       // check for matching single word at index i
-      for (var j = 0; j < known_locations.length; j++) {
-        diff = natural.JaroWinklerDistance(curr, known_locations[j][0]);
+      for (var j = 0; j < locations.length; j++) {
+        diff = natural.JaroWinklerDistance(curr, locations[j][0]);
         if (diff > 0.8) {
-          match = known_locations[j][1];
+          match = locations[j][1];
           break;
         }
       }
@@ -154,10 +119,10 @@ function parseText(text, data) {
       // check for matching pair of words at indices i, i+1
       if (i + 1 < words.length) { // check that it isn't the last token
         curr = words[i] + " " + words[i+1];
-        for (var j = 0; j < known_locations.length; j++) {
-          diff = natural.JaroWinklerDistance(curr, known_locations[j][0]);
+        for (var j = 0; j < locations.length; j++) {
+          diff = natural.JaroWinklerDistance(curr, locations[j][0]);
           if (diff > 0.8) {
-            match = known_locations[j][1];
+            match = locations[j][1];
             break;
           }
         }
