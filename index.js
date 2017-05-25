@@ -12,27 +12,29 @@ var client = new Twitter({
 
 var bb1_data, bb2_data;
 
-client.get('statuses/user_timeline', {screen_name: 'UMassBabyBerk'}, function(error, tweets, response) {
-  if (error) {
-    console.log('Error thrown from Twitter API UMassBabyBerk Timeline');
-    bb1_data = {
-      found: false
-    };
-  } else {
-    bb1_data = interpret.extractData(tweets);
-  }
-});
+var getTweets = function() {
+  client.get('statuses/user_timeline', {screen_name: 'UMassBabyBerk'}, function(error, tweets, response) {
+    if (error) {
+      console.log('Error thrown from Twitter API UMassBabyBerk Timeline');
+      bb1_data = {
+        found: false
+      };
+    } else {
+      bb1_data = interpret.extractData(tweets);
+    }
+  });
 
-client.get('statuses/user_timeline', {screen_name: 'UMassBabyBerk2'}, function(error, tweets, response) {
-  if (error) {
-    console.log('Error thrown from Twitter API UMassBabyBerk2 Timeline');
-    bb2_data = {
-      found: false
-    };
-  } else {
-    bb2_data = interpret.extractData(tweets);
-  }
-});
+  client.get('statuses/user_timeline', {screen_name: 'UMassBabyBerk2'}, function(error, tweets, response) {
+    if (error) {
+      console.log('Error thrown from Twitter API UMassBabyBerk2 Timeline');
+      bb2_data = {
+        found: false
+      };
+    } else {
+      bb2_data = interpret.extractData(tweets);
+    }
+  });
+}
 
 app.set('port', (process.env.PORT || 5000));
 
@@ -57,4 +59,9 @@ app.listen(app.get('port'), function() {
   console.log('Node app is running on port', app.get('port'));
 });
 
-
+// Check for new tweets every 5 minutes
+getTweets();
+var checkNewTweets = setInterval(function() {
+  console.log('Current time: ' + new Date());
+  getTweets();
+}, 1000 * 60 * 5);
