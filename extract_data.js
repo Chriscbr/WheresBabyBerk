@@ -37,17 +37,12 @@ var known_locations = [
 ]
 
 // Regex used for tokenizing tweet text, used by parseTweet and parseText
-var timeIntervalRegex = /(?:(?:\d{1,2}:\d\d)|(?:\d{1,2}))(?:(?:\s?-\s?)|\s?to\s?)(?:(?:\d{1,2}:\d\d)|(?:\d{1,2}))/g;
-var timeIntRegex = new RegExp(''
-  + /(?:(?:\d{1,2}:\d\d)|(?:\d{1,2}))/g.source  // time1
-  + /(?:(?:\s?-\s?)|\s?to\s?)/g.source          // '-' or 'to'
-  + /(?:(?:\d{1,2}:\d\d)|(?:\d{1,2}))/g.source  // time2
-);
+var timeIntervalRegex = /((?:(?:\d{1,2}:\d\d)|(?:\d{1,2}))(?:(?:\s?-\s?)|\s?to\s?)(?:(?:\d{1,2}:\d\d)|(?:\d{1,2})))/g;
 
 /*
-Extracts the desired data from a tweets object returned by the Twitter API.
+Extracts data from a list of tweets obtained from the Twitter API.
 Operates by checking for valid tweets, and passing on operation to parseTweet.
-Example output value:
+Output format:
 {
   found: bool,
   places: [list of strings],
@@ -58,16 +53,14 @@ exports.extractData = function (tweets) {
   console.log('Begin extractData...');
   // console.log(tweets);
 
-  var output;
+  var output = {
+    found: false,
+    places: [],
+    times: []
+  };
 
   if (tweets.length > 0) {
-    output = parseTweet(tweets[0]);
-  } else {
-    output = {
-      found: false,
-      places: [],
-      times: []
-    };
+    output = parseTweet(tweets[0], output);
   }
 
   console.log('Finished extractData. Data returned:');
@@ -77,46 +70,47 @@ exports.extractData = function (tweets) {
 }
 
 /*
-
+Extracts data from an individual tweet obtained from the Twitter API.
+Operates by tokenizing the tweet text into sections of time intervals and text
+in between time intervals, and parses each token, adding to the data object.
+Finally the data is checked for validity and returned if valid.
 */
-function parseTweet(tweet) {
+function parseTweet(tweet, data) {
   console.log('Tweet text: ' + tweet.text);
   console.log('Tweet author: ' + tweet.user.screen_name);
-
-  var data = {
-    found: false, 
-    places: [],
-    times: []
-  }
 
   var completeText = tweet.text;
   var tokenizer = new natural.RegexpTokenizer({pattern: timeIntervalRegex});
   var sections = tokenizer.tokenize(completeText);
+  console.log('sections: ');
+  console.log(sections);
   for (var i = 0; i < sections.length; i++) {
     data = parseText(sections[i], data);
   }
 
-  // return no data found if data is invalid
-  if (!(2 * data.places.length === data.times.length && isRecent(tweet))) {
-    return {
-      found: false,
-      places: [],
-      times: []
-    };
-  } else {
-    return convertData(data);
+  if (!isRecent(tweet)) {
+    console.log("Tweet is not recent enough to be shown.");
+    return data;
   }
+  if (2 * data.places.length !== data.times.length && data.places.length > 0) {
+    console.log("Data extracted from tweet is invalid.");
+    return data;
+  }
+
+  data.found = true;
+  return data;
 }
 
-// parses a "section" of tweet text, which is either a time interval
-// (i.e. "2:30-4") or a string of words in between those
-// intuitively, there should only be one match in between each time interval
-function parseText(str, data) {
-  output = data;
+/*
+Parses a "section" of tweet text, which is either a time interval
+(i.e. "2:30-4") or a string of words in between those
+There should only be one matching location in between each time interval
+otherwise there cannot be a one-to-one location/time interval correspondence.
+*/
+function parseText(text, data) {
 
-  if (timeIntervalRegex.test(str)) { // if it is a time
-
-    times = str.match(/((?:\d{1,2}:\d\d)|(?:\d{1,2}))/g);
+  function parseTime(str) {
+    var times = str.match(/((?:\d{1,2}:\d\d)|(?:\d{1,2}))/g);
     if (!/(\d{1,2}:\d\d)/g.test(times[0])) {
       times[0] = times[0] + ':00';
     }
@@ -125,16 +119,25 @@ function parseText(str, data) {
     }
     output.times.push(times[0]);
     output.times.push(times[1]);
+  }
 
-  } else {
-
+  function parseWords(str) {
     var tokenizer = new natural.WordTokenizer();
     var words = tokenizer.tokenize(str);
     var match = "";
     var i = 0;
-    while (i < words.length) {
+
+    /*
+    TODO: improve processing control structure?
+    The way the entire string is looped through, but exited by using
+    multiple break statements seems janky. But I'm not entirely sure
+    how to make it more elegant/simple.
+    */
+
+    while (i < words.length) { // loops through i words in string
       var curr = words[i];
-      var diff = 0;
+      var diff = 0; // (0 = no match, 1 = exact match)
+
       // check for matching single word at index i
       for (var j = 0; j < known_locations.length; j++) {
         diff = natural.JaroWinklerDistance(curr, known_locations[j][0]);
@@ -149,7 +152,7 @@ function parseText(str, data) {
       }
 
       // check for matching pair of words at indices i, i+1
-      if (i + 1 < words.length) {
+      if (i + 1 < words.length) { // check that it isn't the last token
         curr = words[i] + " " + words[i+1];
         for (var j = 0; j < known_locations.length; j++) {
           diff = natural.JaroWinklerDistance(curr, known_locations[j][0]);
@@ -167,10 +170,19 @@ function parseText(str, data) {
       i++;
     }
 
+    // break statements ensure this line will be reached after first match
     if (match != "") {
       output.places.push(match);
     }
 
+  }
+
+  output = data;
+
+  if (timeIntervalRegex.test(text)) { // case 1: time interval
+    parseTime(text);
+  } else {                            // case 2: non-time interval
+    parseWords(text);
   }
 
   return output;
@@ -186,24 +198,4 @@ function isRecent(tweet) {
   var currTime = new Date();
 
   return currTime < tweetTimePlus12;
-}
-
-// converts list of locations and times into associative array
-function convertData(data) {
-  var places = data.places;
-  var times = data.times;
-
-  console.log('Converting data...');
-  console.log(places);
-  console.log(times);
-
-  var output = {};
-  for (var i = 0; i < data.places; i++) {
-    output[places[i]] = [times[2*i + 1], times[2*i + 1]];
-  }
-
-  console.log('Output data:');
-  console.log(output);
-
-  return output;
 }
