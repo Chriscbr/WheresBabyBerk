@@ -57,6 +57,12 @@ app.get('/test', function(request, response) {
   });
 });
 
+app.get('/menus', function(request, response) {
+  response.render('pages/menus');
+});
+
+app.use('/images', express.static('images'));
+
 app.listen(app.get('port'), function() {
   console.log('Node app is running on port', app.get('port'));
 });
