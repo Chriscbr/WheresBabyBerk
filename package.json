@@ -1,7 +1,8 @@
 {
-  "name": "codename-wbb",
-  "version": "0.2.6",
-  "description": "A sample Node.js app using Express 4",
+  "name": "wheresbabyberk",
+  "version": "1.0.0",
+  "description": "Single-serving website which returns up-to-date food truck location data based on recent tweets.",
+  "author": "Christopher Rybicki",
   "engines": {
     "node": "8.1.4",
     "npm": "3.10.10"
@@ -18,7 +19,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/heroku/node-js-getting-started.git"
+    "url": "https://github.com/Chriscbr/WheresBabyBerk"
   },
   "keywords": [
     "node",
@@ -27,9 +28,7 @@
   ],
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/heroku/node-js-getting-started/issues"
+    "url": "https://github.com/Chriscbr/WheresBabyBerk/issues"
   },
-  "homepage": "https://github.com/heroku/node-js-getting-started#readme",
-  "devDependencies": {},
-  "author": "Christopher Rybicki"
+  "devDependencies": {}
 }
