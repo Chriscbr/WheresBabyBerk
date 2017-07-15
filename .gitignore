@@ -11,3 +11,7 @@ build
 # Docker
 Dockerfile
 docker-compose.yml
+
+# Sublime
+wheresbabyberk.sublime-project
+wheresbabyberk.sublime-workspace
