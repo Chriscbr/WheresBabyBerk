@@ -41,6 +41,10 @@ html, body {
   font-size: 2.5em;
 }
 
+.about {
+  padding: 0 1em;
+}
+
 /*
  * Affix and center
  */
