@@ -21,7 +21,8 @@ exports.extractData = function (tweets) {
   var output = {
     found: false,
     places: [],
-    times: []
+    times: [],
+    lastUpdate: ""
   };
 
   if (tweets.length > 0) {
@@ -63,6 +64,14 @@ function parseTweet(tweet, data) {
   }
 
   data.found = true;
+  tweet_time = new Date(tweet.created_at.replace(/^\w+ (\w+) (\d+) ([\d:]+) \+0000 (\d+)$/,
+    "$1 $2 $4 $3 UTC"));
+  months = ["January", "February", "March", "April", "May", "June", "July",
+            "August", "September", "October", "November", "December"];
+  data.lastUpdate = months[tweet_time.getMonth()] + " " + tweet_time.getDate();
+  data.lastUpdate += ", " + tweet_time.getFullYear() + " at ";
+  data.lastUpdate += tweet_time.getHours() + ":" + tweet_time.getMinutes();
+  data.lastUpdate += ":" + tweet_time.getSeconds();
   return data;
 }
 
@@ -159,7 +168,8 @@ function isRecent(tweet) {
   var tweetTime = new Date(
     tweetTimeStr.replace(/^\w+ (\w+) (\d+) ([\d:]+) \+0000 (\d+)$/,
     "$1 $2 $4 $3 UTC"));
-  var tweetTimePlus12 = new Date(tweetTime.getTime() + 60000 * 60 * 12); // adds 12 hours
+  // adds 12 hours
+  var tweetTimePlus12 = new Date(tweetTime.getTime() + 60000 * 60 * 12);
   var currTime = new Date();
 
   return currTime < tweetTimePlus12;
