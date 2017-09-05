@@ -4,11 +4,23 @@ html, body {
 
 .jumbotron {
   background: #98d100;
-  color: white; }
+  color: white;
+  margin-bottom: 1em;
+}
 
 .tweets {
   background: white;
  }
+
+.bb-title {
+  padding: 0;
+  margin: 0;
+}
+
+.menu-text {
+  margin-top: 0;
+  margin-bottom: 2em;
+}
 
 .extra-space {
   padding: 5px 10px 15px 10px;
