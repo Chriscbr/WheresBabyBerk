@@ -16,7 +16,7 @@ Output format:
 }
 */
 exports.extractData = function (tweets) {
-  console.log('Begin extractData...');
+  console.log('Starting extractData...');
   // console.log(tweets);
 
   var output = {
@@ -28,10 +28,13 @@ exports.extractData = function (tweets) {
 
   if (tweets.length > 0) {
     output = parseTweet(tweets[0], output);
+  } else {
+    console.log('No tweets found.');
   }
 
-  console.log('Finished extractData. Data returned:');
+  console.log('Data returned:')
   console.log(output);
+  console.log('Finished extractData.');
 
   return output;
 }
@@ -43,31 +46,39 @@ in between time intervals, and parses each token, adding to the data object.
 Finally the data is checked for validity and returned if valid.
 */
 function parseTweet(tweet, data) {
-  console.log('Tweet text: ' + tweet.text);
-  console.log('Tweet author: ' + tweet.user.screen_name);
+  console.log(tweet.user.screen_name + ' tweeted: "' + tweet.text + '"');
 
-  var completeText = tweet.text;
-  var tokenizer = new natural.RegexpTokenizer({pattern: timeIntervalRegex});
-  var sections = tokenizer.tokenize(completeText);
-  console.log('sections: ');
-  console.log(sections);
-  for (var i = 0; i < sections.length; i++) {
-    data = parseText(sections[i], data);
-  }
+  // Assign lastUpdate to a timestamp of when the last tweet was.
+  tweet_time = moment(tweet.created_at, "ddd MMM DD HH:mm:ss Z YYYY");
+  data.lastUpdate = tweet_time.format("MMMM Do YYYY, h:mm:ss a");
+  console.log("Last update: " + data.lastUpdate);
 
+  // End parsing early if tweet is more than 12 hours old.
   if (!isRecent(tweet)) {
     console.log("Tweet is not recent enough to be shown.");
     return data;
   }
+
+  // Begin tokenizing tweet's text into its components
+  var completeText = tweet.text;
+  var tokenizer = new natural.RegexpTokenizer({pattern: timeIntervalRegex});
+  var components = tokenizer.tokenize(completeText);
+  console.log('Tweet components: ');
+  console.log(components);
+
+  // Parse the text from each component into the data object
+  for (var i = 0; i < components.length; i++) {
+    data = parseText(components[i], data);
+  }
+
+  // If there was a positive number of times or locations found but they
+  // weren't obtained in a 2:1 ratio, then the parsing is unsuccessful.
   if (2 * data.places.length !== data.times.length && data.places.length > 0) {
     console.log("Data extracted from tweet is invalid.");
     return data;
   }
 
   data.found = true;
-  tweet_time = moment(tweet.created_at, "ddd MMM DD HH:mm:ss Z YYYY");
-  data.lastUpdate = tweet_time.format("MMMM Do YYYY, h:mm:ss a");
-  console.log(data.lastUpdate);
   return data;
 }
 

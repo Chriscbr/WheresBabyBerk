@@ -21,6 +21,7 @@ var getTweets = function() {
       };
       console.log(error);
     } else {
+      console.log("Calling extractData for UMassBabyBerk...");
       bb1_data = interpret.extractData(tweets);
     }
   });
@@ -33,6 +34,7 @@ var getTweets = function() {
       };
       console.log(error);
     } else {
+      console.log("Calling extractData for UMassBabyBerk2...");
       bb2_data = interpret.extractData(tweets);
     }
   });
