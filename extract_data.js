@@ -1,5 +1,6 @@
 var natural = require('natural');
 var locations = require('./locations');
+var moment = require('moment');
 
 // Regex used for tokenizing tweet text, used by parseTweet and parseText
 var timeIntervalRegex = /((?:(?:\d{1,2}:\d\d)|(?:\d{1,2}))(?:(?:\s?-\s?)|\s?to\s?)(?:(?:\d{1,2}:\d\d)|(?:\d{1,2})))/g;
@@ -64,14 +65,8 @@ function parseTweet(tweet, data) {
   }
 
   data.found = true;
-  tweet_time = new Date(tweet.created_at.replace(/^\w+ (\w+) (\d+) ([\d:]+) \+0000 (\d+)$/,
-    "$1 $2 $4 $3 UTC"));
-  months = ["January", "February", "March", "April", "May", "June", "July",
-            "August", "September", "October", "November", "December"];
-  data.lastUpdate = months[tweet_time.getMonth()] + " " + tweet_time.getDate();
-  data.lastUpdate += ", " + tweet_time.getFullYear() + " at ";
-  data.lastUpdate += tweet_time.getHours() + ":" + tweet_time.getMinutes();
-  data.lastUpdate += ":" + tweet_time.getSeconds();
+  tweet_time = moment(tweet.created_at);
+  data.lastUpdate = tweet_time.format("MMMM Do YYYY, h:mm:ss a")
   return data;
 }
 
