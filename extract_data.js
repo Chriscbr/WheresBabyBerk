@@ -65,8 +65,9 @@ function parseTweet(tweet, data) {
   }
 
   data.found = true;
-  tweet_time = moment(tweet.created_at);
-  data.lastUpdate = tweet_time.format("MMMM Do YYYY, h:mm:ss a")
+  tweet_time = moment(tweet.created_at, "ddd MMM DD HH:mm:ss Z YYYY");
+  data.lastUpdate = tweet_time.format("MMMM Do YYYY, h:mm:ss a");
+  console.log(data.lastUpdate);
   return data;
 }
 
@@ -159,13 +160,7 @@ function parseText(text, data) {
 
 // checks if a tweet was made in the last 12 hours
 function isRecent(tweet) {
-  var tweetTimeStr = tweet.created_at; // ex. Sat May 06 02:27:46 +0000 2017
-  var tweetTime = new Date(
-    tweetTimeStr.replace(/^\w+ (\w+) (\d+) ([\d:]+) \+0000 (\d+)$/,
-    "$1 $2 $4 $3 UTC"));
-  // adds 12 hours
-  var tweetTimePlus12 = new Date(tweetTime.getTime() + 60000 * 60 * 12);
-  var currTime = new Date();
-
-  return currTime < tweetTimePlus12;
+  return moment(tweet.created_at, "ddd MMM DD HH:mm:ss Z YYYY")
+    .add(12, 'h')
+    .isAfter(moment());
 }
