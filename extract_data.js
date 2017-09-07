@@ -28,6 +28,7 @@ exports.extractData = function (tweets) {
 
   if (tweets.length > 0) {
     output = parseTweet(tweets[0], output);
+    output = filterByTime(tweets[0], output, moment());
   } else {
     console.log('No tweets found.');
   }
@@ -174,4 +175,41 @@ function isRecent(tweet) {
   return moment(tweet.created_at, "ddd MMM DD HH:mm:ss Z YYYY")
     .add(12, 'h')
     .isAfter(moment());
+}
+
+/* Removes data (place/time pairs) that end before the current time.
+assumes that times listed in a tweet are within the 12 hour period after
+its posting.
+time: moment obj
+tweet: tweet json
+*/
+function filterByTime(tweet, data, time) {
+  var items = []; // indexes of items to remove
+
+  for (var i=0; i<data.places.length; i++) {
+    var endHour = data.times[i*2 + 1]; // ex. '6:30' or '12:00'
+    var endTime = moment(endHour, 'h:mm');
+    // console.log(endTime.format('ddd MMM DD HH:mm:ss'))
+    var baseTime = moment(tweet.created_at, 'ddd MMM DD HH:mm:ss Z YYYY');
+
+    // Add 12 hours up to 2 times until right time is found
+    // (ex. 6pm tweet lists 2:00, can be corrected to 2am of next day)
+    for (var j=0; j<2; j++) {
+      if (endTime.isBefore(baseTime)) {
+        endTime.add(12, 'h');
+      }
+    }
+    console.log(endHour + ' interpreted as ' + endTime.format('ddd MMM DD HH:mm:ss'));
+    if (endTime.isBefore(time)) {
+      items.push(i);
+    }
+  }
+
+  for (var i=items.length-1; i>=0; i--) {
+    console.log('Removing ' + data.places[i]);
+    data.places.splice(i, 1);
+    data.times.splice(i*2, 2);
+  }
+
+  return data;
 }
