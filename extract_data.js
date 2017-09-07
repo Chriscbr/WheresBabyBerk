@@ -23,7 +23,7 @@ exports.extractData = function (tweets) {
     found: false,
     places: [],
     times: [],
-    lastUpdate: ""
+    lastUpdate: ''
   };
 
   if (tweets.length > 0) {
@@ -50,13 +50,13 @@ function parseTweet(tweet, data) {
   console.log(tweet.user.screen_name + ' tweeted: "' + tweet.text + '"');
 
   // Assign lastUpdate to a timestamp of when the last tweet was.
-  tweet_time = moment(tweet.created_at, "ddd MMM DD HH:mm:ss Z YYYY");
-  data.lastUpdate = tweet_time.format("MMMM Do YYYY, h:mm:ss a");
-  console.log("Last update: " + data.lastUpdate);
+  tweet_time = moment(tweet.created_at, 'ddd MMM DD HH:mm:ss Z YYYY');
+  data.lastUpdate = tweet_time.format('MMMM Do YYYY, h:mm:ss a');
+  console.log('Last update: ' + data.lastUpdate);
 
   // End parsing early if tweet is more than 12 hours old.
   if (!isRecent(tweet)) {
-    console.log("Tweet is not recent enough to be shown.");
+    console.log('Tweet is not recent enough to be shown.');
     return data;
   }
 
@@ -75,7 +75,7 @@ function parseTweet(tweet, data) {
   // If there was a positive number of times or locations found but they
   // weren't obtained in a 2:1 ratio, then the parsing is unsuccessful.
   if (2 * data.places.length !== data.times.length && data.places.length > 0) {
-    console.log("Data extracted from tweet is invalid.");
+    console.log('Data extracted from tweet is invalid.');
     return data;
   }
 
@@ -106,7 +106,7 @@ function parseText(text, data) {
   function parseWords(str) {
     var tokenizer = new natural.WordTokenizer();
     var words = tokenizer.tokenize(str);
-    var match = "";
+    var match = '';
     var i = 0;
 
     /*
@@ -135,7 +135,7 @@ function parseText(text, data) {
 
       // check for matching pair of words at indices i, i+1
       if (i + 1 < words.length) { // check that it isn't the last token
-        curr = words[i] + " " + words[i+1];
+        curr = words[i] + ' ' + words[i+1];
         for (var j = 0; j < locations.length; j++) {
           diff = natural.JaroWinklerDistance(curr, locations[j][0]);
           if (diff > 0.8) {
@@ -143,7 +143,7 @@ function parseText(text, data) {
             break;
           }
         }
-        if (match != "") {
+        if (match != '') {
           console.log('"' + curr + '" matches to "' + match + '"');
           break;
         }
@@ -153,7 +153,7 @@ function parseText(text, data) {
     }
 
     // break statements ensure this line will be reached after first match
-    if (match != "") {
+    if (match != '') {
       output.places.push(match);
     }
 
@@ -172,7 +172,7 @@ function parseText(text, data) {
 
 // checks if a tweet was made in the last 12 hours
 function isRecent(tweet) {
-  return moment(tweet.created_at, "ddd MMM DD HH:mm:ss Z YYYY")
+  return moment(tweet.created_at, 'ddd MMM DD HH:mm:ss Z YYYY')
     .add(12, 'h')
     .isAfter(moment());
 }
