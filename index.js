@@ -13,30 +13,32 @@ var client = new Twitter({
 var bb1_data, bb2_data;
 
 var getTweets = function() {
-  client.get('statuses/user_timeline', {screen_name: 'UMassBabyBerk'}, function(error, tweets, response) {
-    if (error) {
-      console.log('Error thrown from Twitter API UMassBabyBerk Timeline:');
-      bb1_data = {
-        found: false
-      };
-      console.log(error);
-    } else {
-      console.log('Calling extractData for UMassBabyBerk...');
-      bb1_data = interpret.extractData(tweets);
-    }
+  client.get('statuses/user_timeline', {screen_name: 'UMassBabyBerk'},
+    function(error, tweets, response) {
+      if (error) {
+        console.log('Error thrown from Twitter API UMassBabyBerk Timeline:');
+        bb1_data = {
+          found: false
+        };
+        console.log(error);
+      } else {
+        console.log('Calling extractData for UMassBabyBerk...');
+        bb1_data = interpret.extractData(tweets);
+      }
   });
 
-  client.get('statuses/user_timeline', {screen_name: 'UMassBabyBerk2'}, function(error, tweets, response) {
-    if (error) {
-      console.log('Error thrown from Twitter API UMassBabyBerk2 Timeline:');
-      bb2_data = {
-        found: false
-      };
-      console.log(error);
-    } else {
-      console.log('Calling extractData for UMassBabyBerk2...');
-      bb2_data = interpret.extractData(tweets);
-    }
+  client.get('statuses/user_timeline', {screen_name: 'UMassBabyBerk2'},
+    function(error, tweets, response) {
+      if (error) {
+        console.log('Error thrown from Twitter API UMassBabyBerk2 Timeline:');
+        bb2_data = {
+          found: false
+        };
+        console.log(error);
+      } else {
+        console.log('Calling extractData for UMassBabyBerk2...');
+        bb2_data = interpret.extractData(tweets);
+      }
   });
 }
 
