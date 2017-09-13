@@ -1,6 +1,6 @@
 var natural = require('natural');
 var locations = require('./locations');
-var moment = require('moment');
+var moment = require('moment-timezone');
 
 // Regex used for tokenizing tweet text, used by parseTweet and parseText
 var timeIntervalRegex = /((?:(?:\d{1,2}:\d\d)|(?:\d{1,2}))(?:(?:\s?-\s?)|\s?to\s?)(?:(?:\d{1,2}:\d\d)|(?:\d{1,2})))/g;
@@ -188,9 +188,13 @@ function filterByTime(tweet, data, time) {
 
   for (var i=0; i<data.places.length; i++) {
     var endHour = data.times[i*2 + 1]; // ex. '6:30' or '12:00'
-    var endTime = moment(endHour, 'h:mm');
-    // console.log(endTime.format('ddd MMM DD HH:mm:ss'))
+    var endTime = moment.tz(endHour, 'h:mm', 'America/New_York');
     var baseTime = moment(tweet.created_at, 'ddd MMM DD HH:mm:ss Z YYYY');
+    endTime.date(baseTime.date())
+
+    // console.log(moment.tz('10:00', 'h:mm', 'America/New_York').format('ddd MMM DD HH:mm:ss'));
+    // console.log(endTime.format('ddd MMM DD HH:mm:ss'));
+    // console.log(baseTime.format('ddd MMM DD HH:mm:ss'));
 
     // Add 12 hours up to 2 times until right time is found
     // (ex. 6pm tweet lists 2:00, can be corrected to 2am of next day)
@@ -199,7 +203,9 @@ function filterByTime(tweet, data, time) {
         endTime.add(12, 'h');
       }
     }
-    console.log(endHour + ' interpreted as ' + endTime.format('ddd MMM DD HH:mm:ss'));
+    console.log(endHour + ' interpreted as ' +
+                endTime.format('ddd MMM DD HH:mm:ss Z'));
+    console.log('baseTime is ' + baseTime.format('ddd MMM DD HH:mm:ss Z'));
     if (endTime.isBefore(time)) {
       items.push(i);
     }
@@ -209,6 +215,11 @@ function filterByTime(tweet, data, time) {
     console.log('Removing ' + data.places[i]);
     data.places.splice(i, 1);
     data.times.splice(i*2, 2);
+  }
+
+  // Prevents bug where text is displayed with blank location and time
+  if (data.places.length == 0) {
+    data.found = false;
   }
 
   return data;
