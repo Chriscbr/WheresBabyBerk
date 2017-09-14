@@ -1,23 +1,27 @@
 <% if (!content2.found) { %>
-	<h4 class="text-center extra-space">No BabyBerk found. Check the latest tweets below!</h4>
+  <h4 class="text-center extra-space">No BabyBerk found. Check the latest tweets below!</h4>
 <% } else { %>
-	<h4 class="text-center extra-space">Currently at <%= content2.places[0] %> until <%= content2.times[1] %></h4>
-	<% if (content2.places.length > 1) { %>
-		<table class="table">
-		<thead>
-			<tr>
-				<th class="text-center">Location</th>
-				<th class="text-center">Time</th>
-			</tr>
-		</thead>
-		<tbody>
-		<% for(var i=1; i<content2.places.length; i++) { %>
-			<tr>
-			<td class="text-center"><%= content2.places[i] %></td>
-			<td class="text-center"><%= content2.times[2*i] %>-<%= content2.times[2*i+1] %></td>
-			</tr>
-		<% } %>
-		</tbody>
-		</table>
-	<% } %>
+  <% if (content2.early) { %>
+    <h4 class="text-center extra-space">Going to <u><%= content2.places[0] %></u> at <u><%= content2.times[0] %></u></h4>
+  <% } else { %>
+    <h4 class="text-center extra-space">Currently at <u><%= content2.places[0] %></u> until <u><%= content2.times[1] %></u></h4>
+  <% } %>
+  <% if (content2.places.length > 1) { %>
+    <table class="table">
+    <thead>
+      <tr>
+        <th class="text-center">Location</th>
+        <th class="text-center">Time</th>
+      </tr>
+    </thead>
+    <tbody>
+    <% for(var i=1; i<content2.places.length; i++) { %>
+      <tr>
+      <td class="text-center"><%= content2.places[i] %></td>
+      <td class="text-center"><%= content2.times[2*i] %>-<%= content2.times[2*i+1] %></td>
+      </tr>
+    <% } %>
+    </tbody>
+    </table>
+  <% } %>
 <% } %>

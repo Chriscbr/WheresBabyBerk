@@ -23,7 +23,8 @@ exports.extractData = function (tweets) {
     found: false,
     places: [],
     times: [],
-    lastUpdate: ''
+    lastUpdate: '',
+    early: false
   };
 
   if (tweets.length > 0) {
@@ -74,7 +75,8 @@ function parseTweet(tweet, data) {
 
   // If there was a positive number of times or locations found but they
   // weren't obtained in a 2:1 ratio, then the parsing is unsuccessful.
-  if (2 * data.places.length !== data.times.length && data.places.length > 0) {
+  if (2 * data.places.length !== data.times.length &&
+      data.places.length > 0) {
     console.log('Data extracted from tweet is invalid.');
     return data;
   }
@@ -178,7 +180,7 @@ function isRecent(tweet) {
 }
 
 /* Removes data (place/time pairs) that end before the current time.
-assumes that times listed in a tweet are within the 12 hour period after
+Assumes that times listed in a tweet are within the 12 hour period after
 its posting.
 time: moment obj
 tweet: tweet json
@@ -186,13 +188,20 @@ tweet: tweet json
 function filterByTime(tweet, data, time) {
   var items = []; // indexes of items to remove
 
+  // Loop through to determine items to remove and add to the list
   for (var i=0; i<data.places.length; i++) {
     var endHour = data.times[i*2 + 1]; // ex. '6:30' or '12:00'
     var endTime = moment.tz(endHour, 'h:mm', 'America/New_York');
-    var baseTime = moment(tweet.created_at, 'ddd MMM DD HH:mm:ss Z YYYY');
-    endTime.date(baseTime.date())
 
-    // console.log(moment.tz('10:00', 'h:mm', 'America/New_York').format('ddd MMM DD HH:mm:ss'));
+    var baseTime = moment(tweet.created_at, 'ddd MMM DD HH:mm:ss Z YYYY');
+    baseTime.subtract(2, 'hours'); // compensate for tweets posted slightly late
+
+    // prevents date from preemptively being set to the next day
+    // which occurs sometimes during moment initialization
+    endTime.date(baseTime.date()); 
+
+    // console.log(moment.tz('10:00', 'h:mm', 'America/New_York')
+    //   .format('ddd MMM DD HH:mm:ss'));
     // console.log(endTime.format('ddd MMM DD HH:mm:ss'));
     // console.log(baseTime.format('ddd MMM DD HH:mm:ss'));
 
@@ -200,14 +209,32 @@ function filterByTime(tweet, data, time) {
     // (ex. 6pm tweet lists 2:00, can be corrected to 2am of next day)
     for (var j=0; j<2; j++) {
       if (endTime.isBefore(baseTime)) {
-        endTime.add(12, 'h');
+        endTime.add(12, 'hours');
       }
     }
     console.log(endHour + ' interpreted as ' +
                 endTime.format('ddd MMM DD HH:mm:ss Z'));
     console.log('baseTime is ' + baseTime.format('ddd MMM DD HH:mm:ss Z'));
+    
     if (endTime.isBefore(time)) {
       items.push(i);
+    } else {
+
+      var startHour = data.times[i*2];
+      var startTime = moment.tz(startHour, 'h:mm', 'America/New_York');
+      startTime.date(baseTime.date());
+      for (var j=0; j<2; j++) {
+        if (startTime.isBefore(baseTime)) {
+          startTime.add(12, 'hours');
+        }
+      }
+
+      if (time.isBefore(startTime)) {
+        data.early = true;
+      }
+
+      // break the loop, since all removable timeslots are consecutive
+      i = data.places.length;
     }
   }
 
