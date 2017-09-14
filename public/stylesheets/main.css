@@ -8,6 +8,10 @@ html, body {
   margin-bottom: 1em;
 }
 
+.tagline {
+  font-weight: 300 !important;
+}
+
 .tweets {
   background: white;
  }
