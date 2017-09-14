@@ -51,10 +51,6 @@ app.set('views', __dirname + '/views');
 app.set('view engine', 'ejs');
 
 app.get('/', function(request, response) {
-  response.render('pages/banner', {data: null});
-});
-
-app.get('/test', function(request, response) {
   response.render('pages/index', {
     content1: bb1_data,
     content2: bb2_data
