@@ -29,7 +29,7 @@ module.exports = [
 ['lorden field', 'Lorden Field'],
 ['physical plant', 'Physical Plant'],
 ['curtain theatre', 'Curtain Theatre'],
-['farmers market', 'Farmers Market'],
+// ['farmers market', 'Farmers Market'],
 ['north apartments', 'North Apartments'],
 ['durfee conservatory', 'Durfee Conservatory']
 ]
