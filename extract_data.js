@@ -17,7 +17,6 @@ Output format:
 */
 exports.extractData = function (tweets) {
   console.log('Starting extractData...');
-  // console.log(tweets);
 
   var output = {
     found: false,
@@ -85,6 +84,35 @@ function parseTweet(tweet, data) {
   return data;
 }
 
+/**
+ * Convert a string containing a time interval into an array containing a
+ * start time string and an end time string. Time intervals can come in a
+ * variety of forms such as '7-9:30', '12-330', and '6:30 to 7:00'.
+ * @param {string} str - The time interval.
+ * @return {string[]} The array of time intervals.
+ */
+function parseTime(str) {
+
+  // Create array of matches formatted like '7:30', '1215', or '9'
+  var times = str.match(/((?:\d{1,2}:\d\d)|(?:\d{3,4})|(?:\d{1,2}))/g);
+
+  for (var i = 0; i < times.length; i++) {
+
+    // Convert times like '7' or '12' to '7:00' or '12:00'
+    if (/(\d{1,2})/g.test(times[i])) times[i] += ':00';
+
+    // Convert times like '930' or '1115' to '9:30' or '11:15'
+    if (/(\d{3,4})/g.test(times[i])) {
+      var len = times[i].length;
+      times[i] = times[i].substring(0, len-2) + ':' +
+          times[i].substring(len-2);
+    }
+
+  }
+
+  return times;
+}
+
 /*
 Parses a "section" of tweet text, which is either a time interval
 (i.e. "2:30-4") or a string of words in between those
@@ -92,28 +120,6 @@ There should only be one matching location in between each time interval
 otherwise there cannot be a one-to-one location/time interval correspondence.
 */
 function parseText(text, data) {
-
-  function parseTime(str, _data) {
-    var times = str.match(/((?:\d{1,2}:\d\d)|(?:\d{3,4})|(?:\d{1,2}))/g);
-    // converts times like 7 or 12 to 7:00 or 12:00
-    if (!/(\d{1,2}:\d\d)/g.test(times[0])) {
-      times[0] = times[0] + ':00';
-    }
-    // converts times like 930 or 1230 to 9:30 or 12:30
-    if (!/(\d{3,4})/g.test(times[0])) {
-      var len = times[0].length;
-      times[0] = times[0].substring(0, len-2) + ':' + times[0].substring(len-2);
-    }
-    if (!/(\d{1,2}:\d\d)/g.test(times[1])) {
-      times[1] = times[1] + ':00';
-    }
-    if (!/(\d{3,4})/g.test(times[0])) {
-      var len = times[1].length;
-      times[1] = times[1].substring(0, len-2) + ':' + times[1].substring(len-2);
-    }
-    _data.times.push(times[0]);
-    _data.times.push(times[1]);
-  }
 
   function parseWords(str) {
     var tokenizer = new natural.WordTokenizer();
@@ -174,7 +180,8 @@ function parseText(text, data) {
   output = data;
 
   if (timeIntervalRegex.test(text)) { // case 1: time interval
-    parseTime(text, output);
+    var times = parseTime(text);
+    output.times = output.times.concat(times);
   } else {                            // case 2: non-time interval
     parseWords(text);
   }
