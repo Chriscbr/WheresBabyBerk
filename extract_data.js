@@ -3,7 +3,7 @@ var locations = require('./locations');
 var moment = require('moment-timezone');
 
 // Regex used for tokenizing tweet text, used by parseTweet and parseText
-var timeIntervalRegex = /((?:(?:\d{1,2}:\d\d)|(?:\d{1,2}))(?:(?:\s?-\s?)|\s?to\s?)(?:(?:\d{1,2}:\d\d)|(?:\d{1,2})))/g;
+var timeIntervalRegex = /((?:(?:\d{1,2}:\d\d)|(?:\d{3,4})|(?:\d{1,2}))(?:(?:\s?-\s?)|\s?to\s?)(?:(?:\d{1,2}:\d\d)|(?:\d{3,4})|(?:\d{1,2})))/g;
 
 /*
 Extracts data from a list of tweets obtained from the Twitter API.
@@ -93,16 +93,26 @@ otherwise there cannot be a one-to-one location/time interval correspondence.
 */
 function parseText(text, data) {
 
-  function parseTime(str) {
-    var times = str.match(/((?:\d{1,2}:\d\d)|(?:\d{1,2}))/g);
+  function parseTime(str, _data) {
+    var times = str.match(/((?:\d{1,2}:\d\d)|(?:\d{3,4})|(?:\d{1,2}))/g);
+    // converts times like 7 or 12 to 7:00 or 12:00
     if (!/(\d{1,2}:\d\d)/g.test(times[0])) {
       times[0] = times[0] + ':00';
+    }
+    // converts times like 930 or 1230 to 9:30 or 12:30
+    if (!/(\d{3,4})/g.test(times[0])) {
+      var len = times[0].length;
+      times[0] = times[0].substring(0, len-2) + ':' + times[0].substring(len-2);
     }
     if (!/(\d{1,2}:\d\d)/g.test(times[1])) {
       times[1] = times[1] + ':00';
     }
-    output.times.push(times[0]);
-    output.times.push(times[1]);
+    if (!/(\d{3,4})/g.test(times[0])) {
+      var len = times[1].length;
+      times[1] = times[1].substring(0, len-2) + ':' + times[1].substring(len-2);
+    }
+    _data.times.push(times[0]);
+    _data.times.push(times[1]);
   }
 
   function parseWords(str) {
@@ -164,7 +174,7 @@ function parseText(text, data) {
   output = data;
 
   if (timeIntervalRegex.test(text)) { // case 1: time interval
-    parseTime(text);
+    parseTime(text, output);
   } else {                            // case 2: non-time interval
     parseWords(text);
   }
