@@ -6,6 +6,8 @@ module.exports = [
 ['hampden', 'Hampden'],
 ['kennedy', 'Kennedy'],
 ['northeast', 'Northeast'],
+['northeast xing', 'Northeast'],
+['northeast crossing', 'Northeast'],
 ['lgrc', 'LGRC'],
 ['haigis', 'Haigis'],
 ['design building', 'Design Building'],
@@ -23,13 +25,19 @@ module.exports = [
 ['student union', 'Student Union'],
 ['umpd', 'UMPD'],
 ['goodell', 'Goodell'],
+['goodell lawn', 'Goodell'],
 ['mullins', 'Mullins'],
 ['fine arts', 'Fine Arts Center'], 
 ['fac', 'Fine Arts Center'],
 ['lorden field', 'Lorden Field'],
 ['physical plant', 'Physical Plant'],
 ['curtain theatre', 'Curtain Theatre'],
-// ['farmers market', 'Farmers Market'],
+['farmers market', 'Farmers Market'],
 ['north apartments', 'North Apartments'],
-['durfee conservatory', 'Durfee Conservatory']
-]
+['durfee conservatory', 'Durfee Conservatory'],
+['totman', 'Totman Gym'],
+['totman gym', 'Totman Gym'],
+['butterfield', 'Butterfield Terrace'],
+['butterfield terr', 'Butterfield Terrace'],
+['butterfield terrace', 'Butterfield Terrace']
+];

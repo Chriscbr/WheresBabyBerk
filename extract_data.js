@@ -194,7 +194,7 @@ function filterByTime(tweet, data, time) {
     var endTime = moment.tz(endHour, 'h:mm', 'America/New_York');
 
     var baseTime = moment(tweet.created_at, 'ddd MMM DD HH:mm:ss Z YYYY');
-    baseTime.subtract(2, 'hours'); // compensate for tweets posted slightly late
+    baseTime.subtract(2, 'hours'); // compensate for tweets posted late
 
     // prevents date from preemptively being set to the next day
     // which occurs sometimes during moment initialization
