@@ -1,9 +1,11 @@
-var natural = require('natural');
-var locations = require('./locations');
-var moment = require('moment-timezone');
+const natural = require('natural');
+const locations = require('./locations');
+const moment = require('moment-timezone');
 
 // Regex used for tokenizing tweet text, used by parseTweet and parseText
-var timeIntervalRegex = /((?:(?:\d{1,2}:\d\d)|(?:\d{3,4})|(?:\d{1,2}))(?:(?:\s?-\s?)|\s?to\s?)(?:(?:\d{1,2}:\d\d)|(?:\d{3,4})|(?:\d{1,2})))/g;
+const r1 = '((?:(?:\\d{1,2}:\\d\\d)|(?:\\d{3,4})|(?:\\d{1,2}))(?:(?:\\s?-\\s';
+const r2 = '?)|\\s?to\\s?)(?:(?:\\d{1,2}:\\d\\d)|(?:\\d{3,4})|(?:\\d{1,2})))';
+const timeIntervalRegex = new RegExp(r1 + r2);
 
 /*
 Extracts data from a list of tweets obtained from the Twitter API.
@@ -15,15 +17,15 @@ Output format:
   times: [list of strings]
 }
 */
-exports.extractData = function (tweets) {
+exports.extractData = function(tweets) {
   console.log('Starting extractData...');
 
-  var output = {
+  let output = {
     found: false,
     places: [],
     times: [],
     lastUpdate: '',
-    early: false
+    early: false,
   };
 
   if (tweets.length > 0) {
@@ -33,12 +35,12 @@ exports.extractData = function (tweets) {
     console.log('No tweets found.');
   }
 
-  console.log('Data returned:')
+  console.log('Data returned:');
   console.log(output);
   console.log('Finished extractData.');
 
   return output;
-}
+};
 
 /*
 Extracts data from an individual tweet obtained from the Twitter API.
@@ -50,8 +52,8 @@ function parseTweet(tweet, data) {
   console.log(tweet.user.screen_name + ' tweeted: "' + tweet.text + '"');
 
   // Assign lastUpdate to a timestamp of when the last tweet was.
-  tweet_time = moment(tweet.created_at, 'ddd MMM DD HH:mm:ss Z YYYY');
-  data.lastUpdate = tweet_time.format('MMMM Do YYYY, h:mm:ss a');
+  const tweetTime = moment(tweet.created_at, 'ddd MMM DD HH:mm:ss Z YYYY');
+  data.lastUpdate = tweetTime.format('MMMM Do YYYY, h:mm:ss a');
   console.log('Last update: ' + data.lastUpdate);
 
   // End parsing early if tweet is more than 12 hours old.
@@ -61,14 +63,14 @@ function parseTweet(tweet, data) {
   }
 
   // Begin tokenizing tweet's text into its components
-  var completeText = tweet.text;
-  var tokenizer = new natural.RegexpTokenizer({pattern: timeIntervalRegex});
-  var components = tokenizer.tokenize(completeText);
+  const completeText = tweet.text;
+  const tokenizer = new natural.RegexpTokenizer({pattern: timeIntervalRegex});
+  const components = tokenizer.tokenize(completeText);
   console.log('Tweet components: ');
   console.log(components);
 
   // Parse the text from each component into the data object
-  for (var i = 0; i < components.length; i++) {
+  for (let i = 0; i < components.length; i++) {
     data = parseText(components[i], data);
   }
 
@@ -92,22 +94,19 @@ function parseTweet(tweet, data) {
  * @return {string[]} The array of time intervals.
  */
 function parseTime(str) {
-
   // Create array of matches formatted like '7:30', '1215', or '9'
-  var times = str.match(/((?:\d{1,2}:\d\d)|(?:\d{3,4})|(?:\d{1,2}))/g);
+  let times = str.match(/((?:\d{1,2}:\d\d)|(?:\d{3,4})|(?:\d{1,2}))/g);
 
-  for (var i = 0; i < times.length; i++) {
-
+  for (let i = 0; i < times.length; i++) {
     // Convert times like '7' or '12' to '7:00' or '12:00'
     if (/(\d{1,2})/g.test(times[i])) times[i] += ':00';
 
     // Convert times like '930' or '1115' to '9:30' or '11:15'
     if (/(\d{3,4})/g.test(times[i])) {
-      var len = times[i].length;
+      const len = times[i].length;
       times[i] = times[i].substring(0, len-2) + ':' +
           times[i].substring(len-2);
     }
-
   }
 
   return times;
@@ -120,12 +119,11 @@ There should only be one matching location in between each time interval
 otherwise there cannot be a one-to-one location/time interval correspondence.
 */
 function parseText(text, data) {
-
   function parseWords(str) {
-    var tokenizer = new natural.WordTokenizer();
-    var words = tokenizer.tokenize(str);
-    var match = '';
-    var i = 0;
+    const tokenizer = new natural.WordTokenizer();
+    const words = tokenizer.tokenize(str);
+    let match = '';
+    let i = 0;
 
     /*
     TODO: improve processing control structure?
@@ -135,11 +133,12 @@ function parseText(text, data) {
     */
 
     while (i < words.length) { // loops through i words in string
-      var curr = words[i];
-      var diff = 0; // (0 = no match, 1 = exact match)
+      let curr = words[i];
+      let diff = 0; // (0 = no match, 1 = exact match)
 
       // check for matching single word at index i
-      for (var j = 0; j < locations.length; j++) {
+      for (let j = 0; j < locations.length; j++) {
+        // eslint-disable-next-line new-cap
         diff = natural.JaroWinklerDistance(curr, locations[j][0]);
         if (diff > 0.8) {
           match = locations[j][1];
@@ -154,7 +153,8 @@ function parseText(text, data) {
       // check for matching pair of words at indices i, i+1
       if (i + 1 < words.length) { // check that it isn't the last token
         curr = words[i] + ' ' + words[i+1];
-        for (var j = 0; j < locations.length; j++) {
+        for (let j = 0; j < locations.length; j++) {
+          // eslint-disable-next-line new-cap
           diff = natural.JaroWinklerDistance(curr, locations[j][0]);
           if (diff > 0.8) {
             match = locations[j][1];
@@ -174,15 +174,13 @@ function parseText(text, data) {
     if (match != '') {
       output.places.push(match);
     }
-
   }
 
-  output = data;
+  let output = data;
 
   if (timeIntervalRegex.test(text)) { // case 1: time interval
-    var times = parseTime(text);
-    output.times = output.times.concat(times);
-  } else {                            // case 2: non-time interval
+    output.times = output.times.concat(parseTime(text));
+  } else { // case 2: non-time interval
     parseWords(text);
   }
 
@@ -203,19 +201,18 @@ time: moment obj
 tweet: tweet json
 */
 function filterByTime(tweet, data, time) {
-  var items = []; // indexes of items to remove
+  let items = []; // indexes of items to remove
 
   // Loop through to determine items to remove and add to the list
-  for (var i=0; i<data.places.length; i++) {
-    var endHour = data.times[i*2 + 1]; // ex. '6:30' or '12:00'
-    var endTime = moment.tz(endHour, 'h:mm', 'America/New_York');
-
-    var baseTime = moment(tweet.created_at, 'ddd MMM DD HH:mm:ss Z YYYY');
+  for (let i=0; i<data.places.length; i++) {
+    const endHour = data.times[i*2 + 1]; // ex. '6:30' or '12:00'
+    let endTime = moment.tz(endHour, 'h:mm', 'America/New_York');
+    let baseTime = moment(tweet.created_at, 'ddd MMM DD HH:mm:ss Z YYYY');
     baseTime.subtract(2, 'hours'); // compensate for tweets posted late
 
     // prevents date from preemptively being set to the next day
     // which occurs sometimes during moment initialization
-    endTime.date(baseTime.date()); 
+    endTime.date(baseTime.date());
 
     // console.log(moment.tz('10:00', 'h:mm', 'America/New_York')
     //   .format('ddd MMM DD HH:mm:ss'));
@@ -224,7 +221,7 @@ function filterByTime(tweet, data, time) {
 
     // Add 12 hours up to 2 times until right time is found
     // (ex. 6pm tweet lists 2:00, can be corrected to 2am of next day)
-    for (var j=0; j<2; j++) {
+    for (let j=0; j<2; j++) {
       if (endTime.isBefore(baseTime)) {
         endTime.add(12, 'hours');
       }
@@ -232,15 +229,14 @@ function filterByTime(tweet, data, time) {
     console.log(endHour + ' interpreted as ' +
                 endTime.format('ddd MMM DD HH:mm:ss Z'));
     console.log('baseTime is ' + baseTime.format('ddd MMM DD HH:mm:ss Z'));
-    
+
     if (endTime.isBefore(time)) {
       items.push(i);
     } else {
-
-      var startHour = data.times[i*2];
-      var startTime = moment.tz(startHour, 'h:mm', 'America/New_York');
+      const startHour = data.times[i*2];
+      let startTime = moment.tz(startHour, 'h:mm', 'America/New_York');
       startTime.date(baseTime.date());
-      for (var j=0; j<2; j++) {
+      for (let j=0; j<2; j++) {
         if (startTime.isBefore(baseTime)) {
           startTime.add(12, 'hours');
         }
@@ -255,7 +251,7 @@ function filterByTime(tweet, data, time) {
     }
   }
 
-  for (var i=items.length-1; i>=0; i--) {
+  for (let i=items.length-1; i>=0; i--) {
     console.log('Removing ' + data.places[i]);
     data.places.splice(i, 1);
     data.times.splice(i*2, 2);
