@@ -99,8 +99,9 @@ function parseTime(str) {
 
   for (let i = 0; i < times.length; i++) {
     // Convert times like '7' or '12' to '7:00' or '12:00'
-    if (/(\d{1,2})/g.test(times[i])) times[i] += ':00';
-
+    if (/(\d{1,2})/g.test(times[i]) && !/(\d{1,2}:\d\d)/g.test(times[i])) {
+      times[i] += ':00';
+    }
     // Convert times like '930' or '1115' to '9:30' or '11:15'
     if (/(\d{3,4})/g.test(times[i])) {
       const len = times[i].length;
