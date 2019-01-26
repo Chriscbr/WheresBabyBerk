@@ -44,4 +44,6 @@ module.exports = [
 ['butterfield terrace', 'Butterfield Terrace'],
 ['transit', 'Transit Services'],
 ['transit services', 'Transit Services'],
+['worcester', 'Worcester Dining Commons'],
+['worcester dc', 'Worcester Dining Commons']
 ];
